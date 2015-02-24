@@ -11,16 +11,33 @@ using System;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Enumeration.Pnp;
+using BLE_UART;
+using BLE_UART.Common;
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+
+
 
 namespace BLE_UART
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class Scenario1_DeviceEvents : Page
+    public sealed partial class UARTMain : Page
     {
         
-        public Scenario1_DeviceEvents()
+        public UARTMain()
         {
             this.InitializeComponent();
         }
@@ -36,26 +53,18 @@ namespace BLE_UART
             {
                 foreach (var measurement in UARTService.Instance.DataPoints)
                 {
-                    outputListBox.Items.Add(measurement.ToString());
+                    outputListBox.Items.Add("RX: "+measurement.ToString());
                 }
-                outputGrid.Visibility = Visibility.Visible;
-
+                
                 RunButton.IsEnabled = false;
             }
-            UARTService.Instance.ValueChangeCompleted_2 += Instance_ValueChangeCompleted;
-
-
+            UARTService.Instance.ValueChangeCompleted += Instance_ValueChangeCompleted;
 
         }
         
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            UARTService.Instance.ValueChangeCompleted_2 -= Instance_ValueChangeCompleted;
-        }
-
-        void outputDataChart_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-
+            UARTService.Instance.ValueChangeCompleted -= Instance_ValueChangeCompleted;
         }
 
         private async void Instance_ValueChangeCompleted(UARTElement UARTElementValue)
@@ -63,11 +72,8 @@ namespace BLE_UART
             // Serialize UI update to the the main UI thread.
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                statusTextBlock.Text = "Latest received heart rate measurement: " +
-                    UARTElementValue.HeartRateValue;
-
-
-
+                statusTextBlock.Text = "Received: " +
+                    UARTElementValue.ToString();                
                 outputListBox.Items.Insert(0, UARTElementValue);
             });
         }
@@ -107,10 +113,8 @@ namespace BLE_UART
             DevicesListBox.Visibility = Visibility.Collapsed;
 
             statusTextBlock.Text = "Initializing device...";
-            UARTService.Instance.DeviceConnectionUpdated_2 += OnDeviceConnectionUpdated;
+            UARTService.Instance.DeviceConnectionUpdated += OnDeviceConnectionUpdated;
             await UARTService.Instance.InitializeServiceAsync(device);
-
-            outputGrid.Visibility = Visibility.Visible;
 
             try
             {
@@ -159,6 +163,9 @@ namespace BLE_UART
                 // send the data using the function UART_Transmit
                 await UARTService.Instance.UART_Transmit(data, length);
                 sendThisText.Text = "";
+
+                outputListBox.Items.Add("TX: " + data);
+
             }
             catch
             {

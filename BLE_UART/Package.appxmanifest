@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="30411c4e-4ba3-4349-8f26-9162dee6211a" Publisher="CN=resol_000" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="30411c4e-4ba3-4349-8f26-9162dee6211a" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="31905WAKProductions.BluetoothLEUART8001" Publisher="CN=AF8D2646-A3D4-4BDC-8F0D-6E6228A8D466" Version="1.1.1.1" />
+  <mp:PhoneIdentity PhoneProductId="8d80090e-d362-4de6-a682-d1f0b3058875" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>BLE_UART</DisplayName>
-    <PublisherDisplayName>resol_000</PublisherDisplayName>
+    <DisplayName>Bluetooth LE UART 8001</DisplayName>
+    <PublisherDisplayName>ResoluteDreamer</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>
@@ -15,9 +15,8 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="BLE_UART.App">
-      <m3:VisualElements DisplayName="BLE_UART" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="This is an unofficial Windows Phone app that replicates the functionality of the app nRF UART 2.0 on the Android App store. This app supports Bluetooth LE devices running a custom Nordic Semiconductor UART service, and allows you to send ASCII / UTF-8 text strings to the BLE device and receive from the device." ForegroundText="light" BackgroundColor="transparent">
-        <m3:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png" />
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Bluetooth LE UART 8001.App">
+      <m3:VisualElements DisplayName="Bluetooth LE UART 8001" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="This is an unofficial Windows Phone app that replicates the functionality of the app nRF UART 2.0 on the Android App store. This app supports Bluetooth LE devices running a custom Nordic Semiconductor UART service, and allows you to send ASCII / UTF-8 text strings to the BLE device and receive from the device." ForegroundText="light" BackgroundColor="transparent">
         <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" />

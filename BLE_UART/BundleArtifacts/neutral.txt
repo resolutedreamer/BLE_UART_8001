@@ -1,0 +1,4 @@
+MainPackage=F:\ZDrive\Act Now!\BLE_UART\BLE_UART\bin\Release\BLE_UART_1.1.1.1_Bundle\BLE_UART_1.1.1.1_AnyCPU.appx
+SymbolPackage=F:\ZDrive\Act Now!\BLE_UART\BLE_UART\AppPackages\BLE_UART_1.1.1.1_Test\BLE_UART_1.1.1.1_AnyCPU.appxsym
+ResourcePack=F:\ZDrive\Act Now!\BLE_UART\BLE_UART\bin\Release\BLE_UART_1.1.1.1_Bundle\BLE_UART_1.1.1.1_scale-100.appx
+ResourcePack=F:\ZDrive\Act Now!\BLE_UART\BLE_UART\bin\Release\BLE_UART_1.1.1.1_Bundle\BLE_UART_1.1.1.1_scale-140.appx

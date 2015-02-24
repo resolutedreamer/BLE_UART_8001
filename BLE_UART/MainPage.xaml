@@ -7,9 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    
-    
     <Page.Resources>
         <Style x:Key="BasicTextStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe WP"/>
@@ -84,13 +81,7 @@
             <Setter Property="Foreground" Value="Gray"/>
         </Style>
     </Page.Resources>
-    
-    
-    
-    
-    
     <Grid x:Name="LayoutRoot">
-
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -118,9 +109,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <Button x:Name="PairButton" Grid.Row="1" Content="Pair Device" Margin="0,0,10,0" Click="PairButton_Click" />
-                    <Button x:Name="RunButton" Grid.Row="1" Content="Connect to Device" Margin="0,0,10,0" Click="RunButton_Click"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button x:Name="PairButton"  Content="Pair Device" Margin="0,0,10,0" Click="PairButton_Click"/>
+                    <Button x:Name="RunButton" Content="Connect to Device" Margin="0,0,10,0" Click="RunButton_Click"/>
                 </StackPanel>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto">
@@ -136,23 +127,14 @@
                     </StackPanel>
                 </ScrollViewer>
 
-
                 <Grid Grid.Row="2" x:Name="outputGrid" Visibility="Visible">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ListBox Grid.Row="1" Name="outputListBox" MinWidth="200" Height="200" HorizontalAlignment="Stretch"/>
-                    </Grid>
+                    <ListBox Name="outputListBox" MinWidth="200" Height="200" HorizontalAlignment="Stretch"/>
                 </Grid>
 
                 <StackPanel Grid.Row="3" Orientation="Horizontal">
-                    <TextBox Name="sendThisText" Width="100" ></TextBox>
-                    <Button Click="Button_Click">Send!</Button>
+                    <TextBox Name="sendThisText" MinWidth="200" Margin="5,5,9,5" />
+                    <Button Click="Button_Click" Content="Send"/>
                 </StackPanel>
-
-
             </Grid>
         </Grid>
     </Grid>

@@ -2,20 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
-
-
-
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Enumeration.Pnp;
 using Windows.Storage;
-
 using System.Runtime.InteropServices.WindowsRuntime; // extension method byte[].AsBuffer()
-
-
 using BLE_UART;
 
 
@@ -24,25 +17,16 @@ namespace BLE_UART
     public class UARTElement
     {
         //idk for now
-        public char a_char;
-
-        public ushort HeartRateValue { get; set; }
-        public bool HasExpendedEnergy { get; set; }
-        public ushort ExpendedEnergy { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
+        public string sent_text { get; set; }
 
         public override string ToString()
         {
-            return a_char.ToString();
+            return sent_text.ToString();
         }
-
-        
-
-
     }
 
-    public delegate void ValueChangeCompletedHandler_2(UARTElement uartdata);
-    public delegate void DeviceConnectionUpdatedHandler_2(bool isConnected);
+    public delegate void ValueChangeCompletedHandler(UARTElement uartdata);
+    public delegate void DeviceConnectionUpdatedHandler(bool isConnected);
 
     public class UARTService
     {
@@ -87,8 +71,8 @@ namespace BLE_UART
         private PnpObjectWatcher watcher;
         private String deviceContainerId;
 
-        public event ValueChangeCompletedHandler_2 ValueChangeCompleted_2;
-        public event DeviceConnectionUpdatedHandler_2 DeviceConnectionUpdated_2;
+        public event ValueChangeCompletedHandler ValueChangeCompleted;
+        public event DeviceConnectionUpdatedHandler DeviceConnectionUpdated;
 
         public static UARTService Instance
         {
@@ -121,8 +105,6 @@ namespace BLE_UART
         private UARTService()
         {
             datapoints = new List<UARTElement>();
-            App.Current.Suspending += App_Suspending;
-            App.Current.Resuming += App_Resuming;
         }
 
         
@@ -160,11 +142,23 @@ namespace BLE_UART
                 rx_characteristic = null;
             }
 
+            if (tx_characteristic != null)
+            {
+                tx_characteristic = null;
+            }
+
+
+
             if (watcher != null)
             {
                 watcher.Stop();
                 watcher = null;
             }
+
+
+
+
+
         }
         
         public async Task InitializeServiceAsync(DeviceInformation device)
@@ -197,9 +191,6 @@ namespace BLE_UART
         {
             try
             {
-
-#if WINDOWS_PHONE_APP
-
                 // Obtain the characteristic for which notifications are to be received
                 var characteristic_list = service.GetAllCharacteristics();
                 int num_characteristics_found = characteristic_list.Count;
@@ -218,27 +209,32 @@ namespace BLE_UART
                         if (i == 0)
                         {
                             tx_characteristic = current_characteristic;
-                            tx_characteristic.ProtectionLevel = GattProtectionLevel.Plain;
+
+                            // do not try to set the gatt protection level on a write characterisitc
+                            // bad things will happen to you
+                            //tx_characteristic.ProtectionLevel = GattProtectionLevel.Plain;
                         }
                         else if (i == 1)
                         {
                             rx_characteristic = current_characteristic;
+                            // now for this notify characteristic, it seems to the the case that it is
+                            // a good idea for the level to be plain
                             rx_characteristic.ProtectionLevel = GattProtectionLevel.Plain;
                         }
                         enumeratorable_list.MoveNext();
                     }
                 }
 
+                
+                try
+                {
+                    // Register the event handler for receiving notifications
+                    rx_characteristic.ValueChanged += Characteristic_ValueChanged;
+                }
+                catch
+                {
 
-#endif
-
-                // While encryption is not required by all devices, if encryption is supported by the device,
-                // it can be enabled by setting the ProtectionLevel property of the Characteristic object.
-                // All subsequent operations on the characteristic will work over an encrypted link.
-                //characteristic.ProtectionLevel = GattProtectionLevel.Plain;
-
-                // Register the event handler for receiving notifications
-                rx_characteristic.ValueChanged += Characteristic_ValueChanged;
+                }
 
                 // In order to avoid unnecessary communication with the device, determine if the device is already 
                 // correctly configured to send notifications.
@@ -246,8 +242,9 @@ namespace BLE_UART
                 // value from the system cache and communication with the device is not typically required.
                 var currentDescriptorValue = await rx_characteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
 
-                if ((currentDescriptorValue.Status != GattCommunicationStatus.Success) ||
-                    (currentDescriptorValue.ClientCharacteristicConfigurationDescriptor != RX_CHARACTERISTIC_NOTIFICATION_TYPE))
+                bool a = (currentDescriptorValue.Status != GattCommunicationStatus.Success);
+                bool b = (currentDescriptorValue.ClientCharacteristicConfigurationDescriptor != RX_CHARACTERISTIC_NOTIFICATION_TYPE);
+                if ( a || b)
                 {
                     // Set the Client Characteristic Configuration Descriptor to enable the device to send notifications
                     // when the Characteristic value changes
@@ -306,9 +303,9 @@ namespace BLE_UART
                 }
 
                 // Notifying subscribers of connection state updates
-                if (DeviceConnectionUpdated_2 != null)
+                if (DeviceConnectionUpdated != null)
                 {
-                    DeviceConnectionUpdated_2(isConnected);
+                    DeviceConnectionUpdated(isConnected);
                 }
             }
         }
@@ -325,17 +322,21 @@ namespace BLE_UART
             DataReader.FromBuffer(args.CharacteristicValue).ReadBytes(data);
 
             // Process the raw data received from the device.
-            var value = ProcessData(data);
-            value.Timestamp = args.Timestamp;
+            var astring = UART_Data_Converter.RX(data);
+
+            var value = new UARTElement
+            {
+                sent_text = astring
+            };
 
             lock (datapoints)
             {
                 datapoints.Add(value);
             }
 
-            if (ValueChangeCompleted_2 != null)
+            if (ValueChangeCompleted != null)
             {
-                ValueChangeCompleted_2(value);
+                ValueChangeCompleted(value);
             }
         }
 
@@ -356,67 +357,8 @@ namespace BLE_UART
             }
         }
 
-        /// <summary>
-        /// Process the raw data received from the device into application usable data, 
-        /// according the the Bluetooth Heart Rate Profile.
-        /// </summary>
-        /// <param name="data">Raw data received from the heart rate monitor.</param>
-        /// <returns>The heart rate measurement value.</returns>
-        private UARTElement ProcessData(byte[] data)
-        {
-            char first_letter = Convert.ToChar(data);
-            return new UARTElement
-            {
-                a_char = first_letter
-            };
 
-            
 
-            /*
-
-            // Heart Rate profile defined flag values
-            const byte HEART_RATE_VALUE_FORMAT = 0x01;
-            const byte ENERGY_EXPANDED_STATUS = 0x08;
-
-            byte currentOffset = 0;
-            byte flags = data[currentOffset];
-            bool isHeartRateValueSizeLong = ((flags & HEART_RATE_VALUE_FORMAT) != 0);
-            bool hasEnergyExpended = ((flags & ENERGY_EXPANDED_STATUS) != 0);
-
-            currentOffset++;
-
-            ushort UARTElementValue = 0;
-
-            if (isHeartRateValueSizeLong)
-            {
-                UARTElementValue = (ushort)((data[currentOffset + 1] << 8) + data[currentOffset]);
-                currentOffset += 2;
-            }
-            else
-            {
-                UARTElementValue = data[currentOffset];
-                currentOffset++;
-            }
-
-            ushort expendedEnergyValue = 0;
-
-            if (hasEnergyExpended)
-            {
-                expendedEnergyValue = (ushort)((data[currentOffset + 1] << 8) + data[currentOffset]);
-                currentOffset += 2;
-            }
-
-            // The Heart Rate Bluetooth profile can also contain sensor contact status information,
-            // and R-Wave interval measurements, which can also be processed here. 
-            // For the purpose of this sample, we don't need to interpret that data.
-
-            return new UARTElement
-            {
-                HeartRateValue = UARTElementValue,
-                HasExpendedEnergy = hasEnergyExpended,
-                ExpendedEnergy = expendedEnergyValue
-            };*/
-        }
     }
 
     public sealed class UART_Data_Converter
@@ -434,8 +376,14 @@ namespace BLE_UART
         }
         public static string RX(byte[] recived_this)
         {
-            string datastring;
-            datastring = BitConverter.ToString(recived_this);
+            int length = recived_this.Length;
+            string datastring = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                char temp = (char)recived_this[i];
+                datastring += temp;
+            }
             return datastring;
         }        
     }
