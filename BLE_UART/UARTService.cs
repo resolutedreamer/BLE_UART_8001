@@ -183,7 +183,7 @@ namespace BLE_UART
 
             }
         }
-        
+
         /// <summary>
         /// Configure the Bluetooth device to send notifications whenever the Characteristic value changes
         /// </summary>
@@ -191,8 +191,10 @@ namespace BLE_UART
         {
             try
             {
+                //*** replace this *********************
+
                 // Obtain the characteristic for which notifications are to be received
-                var characteristic_list = service.GetAllCharacteristics();
+                /*var characteristic_list = service.GetAllCharacteristics();
                 int num_characteristics_found = characteristic_list.Count;
                 if (num_characteristics_found == 0)
                 {
@@ -205,11 +207,11 @@ namespace BLE_UART
                     for (int i = 0; i < num_characteristics_found; i++)
                     {
                         var current_characteristic = enumeratorable_list.Current;
-
+ 
                         if (i == 0)
                         {
                             tx_characteristic = current_characteristic;
-
+ 
                             // do not try to set the gatt protection level on a write characterisitc
                             // bad things will happen to you
                             //tx_characteristic.ProtectionLevel = GattProtectionLevel.Plain;
@@ -223,20 +225,28 @@ namespace BLE_UART
                         }
                         enumeratorable_list.MoveNext();
                     }
-                }
+                }*/
 
-                
+                //*** with this ***************
+
+                tx_characteristic = service.GetCharacteristics(new Guid("6E400002-B5A3-F393-E0A9-E50E24DCCA9E")).First();
+                rx_characteristic = service.GetCharacteristics(new Guid("6E400003-B5A3-F393-E0A9-E50E24DCCA9E")).First();
+
+                await rx_characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+
+                //*****************************
+
                 try
                 {
                     // Register the event handler for receiving notifications
                     rx_characteristic.ValueChanged += Characteristic_ValueChanged;
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    var message = ex.Message;
                 }
 
-                // In order to avoid unnecessary communication with the device, determine if the device is already 
+                // In order to avoid unnecessary communication with the device, determine if the device is already
                 // correctly configured to send notifications.
                 // By default ReadClientCharacteristicConfigurationDescriptorAsync will attempt to get the current
                 // value from the system cache and communication with the device is not typically required.
@@ -244,7 +254,8 @@ namespace BLE_UART
 
                 bool a = (currentDescriptorValue.Status != GattCommunicationStatus.Success);
                 bool b = (currentDescriptorValue.ClientCharacteristicConfigurationDescriptor != RX_CHARACTERISTIC_NOTIFICATION_TYPE);
-                if ( a || b)
+
+                if (a || b)
                 {
                     // Set the Client Characteristic Configuration Descriptor to enable the device to send notifications
                     // when the Characteristic value changes
@@ -264,7 +275,7 @@ namespace BLE_UART
             {
 
             }
-        }
+       }
 
         /// <summary>
         /// Register to be notified when a connection is established to the Bluetooth device
