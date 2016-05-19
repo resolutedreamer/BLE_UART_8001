@@ -12,7 +12,7 @@ Connect your Windows Phone device via Bluetooth Low Energy (Bluetooth Smart) to 
 ### Installation
 
 If you just want to try the app out, get it from the Windows Store!
-[Download Link](https://www.microsoft.com/en-us/store/apps/smartpakku/9nblggh16nmk)
+[Download Link](https://www.microsoft.com/en-us/store/apps/bluetooth-le-uart-8001/9nblgggzpw0q)
 
 Otherwise, you probably want to actually use it for development. Open the solution (BLE_UART.sln) in Visual Studio and compile it with your Windows Phone device as the target.
 
