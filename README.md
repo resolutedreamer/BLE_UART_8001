@@ -5,7 +5,7 @@ A sample app like [nRF UART (iOS)](https://itunes.apple.com/us/app/nrf-uart/id61
 Connect your Windows Phone device via Bluetooth Low Energy (Bluetooth Smart) to a device running the custom Nordic Semiconductor UART service. Developed using the Arduino Uno with the Adafruit [Bluefruit LE - Bluetooth Low Energy (BLE 4.0) - nRF8001 Breakout - v1.0](https://www.adafruit.com/product/1697)
 
 #### Screenshot
-![screenshot](BLE_UARTAssets/screenshots/ss2.png)
+![screenshot](BLE_UARTAssets/screenshots/smallss.png)
 
 ## Getting Started
 
