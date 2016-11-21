@@ -37,7 +37,7 @@ Heavily borrowed from official sample:
 *  [Bluetooth Generic Attribute Profile - Heart Rate Service](https://code.msdn.microsoft.com/windowsapps/Bluetooth-Generic-5a99ef95)
 
 ## License 
-* This project is licensed under the Apache License - see the [LICENSE.md](https://github.com/resolutedreamer/BLE_UART_8001/blob/master/LICENSE) file for details
+* This project is licensed under the Apache License - see the [LICENSE](https://github.com/resolutedreamer/BLE_UART_8001/blob/master/LICENSE) file for details
 
 ## Version 
 * Version 1.0
